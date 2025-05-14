@@ -1,6 +1,6 @@
 ﻿namespace Game.UI.Dogs
 {
-    public interface IDogDataView : IServerDataRequireButton
+    public interface IDogDataView
     {
         public void SetId(string id);
         public void SetName(string dogName);

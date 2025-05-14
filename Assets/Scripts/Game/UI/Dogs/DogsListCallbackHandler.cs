@@ -7,15 +7,13 @@ using UnityEngine.Networking;
 
 namespace Game.UI.Dogs
 {
-    public class DogsCallbackHandler : IServerCallbackHandler<DogBreedsDataResponse>
+    public class DogsListCallbackHandler : IServerCallbackHandler<DogBreedsDataResponse>
     {
-        private WeatherPeriod _currentPeriod;
-        
         private readonly BaseParser<DogBreedsDataResponse> _serverDataParser;
         private readonly ReactiveEvent<DogBreedsDataResponse> _onNewDataFromServer;
         public IReadOnlyReactiveEvent<DogBreedsDataResponse> OnNewDataFromServer => _onNewDataFromServer;
 
-        public DogsCallbackHandler()
+        public DogsListCallbackHandler()
         {
             _serverDataParser= new BaseParser<DogBreedsDataResponse>();
             _onNewDataFromServer = new ReactiveEvent<DogBreedsDataResponse>();

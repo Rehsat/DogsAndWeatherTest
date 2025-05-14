@@ -8,8 +8,6 @@ namespace Game.UI.PopUps
 {
     public class PopUp : MonoBehaviour
     {
-        [SerializeField] private Button _closeButton;
-        [SerializeField] private Image _background;
         [SerializeField] private List<Button> _allCloseButtons;
         
         private ReactiveTrigger _onHide;
@@ -18,7 +16,6 @@ namespace Game.UI.PopUps
         public void Construct(ReactiveTrigger onHide)
         {
             _onHide = onHide;
-            _closeButton.onClick.AddListener(Hide);
             _allCloseButtons.ForEach(closeButton => closeButton.onClick.AddListener(Hide));
         }
 
@@ -37,8 +34,6 @@ namespace Game.UI.PopUps
         {
             transform.localScale = Vector3.zero;
             transform.DOScale(1, 0.3f).SetEase(Ease.OutBack);
-            if(_background != null)
-                _background.gameObject.SetActive(true);
         }
     }
 }

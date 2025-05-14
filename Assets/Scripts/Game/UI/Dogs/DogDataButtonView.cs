@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace Game.UI.Dogs
 {
-    public class DogDataButtonView : MonoBehaviour, IDogDataView, ILoadViewContainer, IPoolableObject
+    public class DogDataButtonView : MonoBehaviour, IDogDataView, ILoadViewContainer, IPoolableObject, IServerDataRequireButton
     {
         [SerializeField] private TMP_Text _id;
         [SerializeField] private TMP_Text _name;

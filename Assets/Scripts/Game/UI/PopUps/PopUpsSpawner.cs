@@ -17,9 +17,8 @@ namespace Game.UI.PopUps
         private ReactiveTrigger _onHide;
 
         [Inject]
-        public void Construct(Canvas sceneObjectsContainer)
+        public void Construct()
         {
-            return;
             _onHide = new ReactiveTrigger();
             _popUps = new Dictionary<PopUpType, PopUp>();
             _onHide.Subscribe((() =>
@@ -38,6 +37,7 @@ namespace Game.UI.PopUps
             _popUps.Add(popUpType, popUp);
             popUp.Construct(_onHide);
             popUp.transform.parent = this.transform;
+            popUp.gameObject.SetActive(false);
         }
 
         public void SpawnPopUp(PopUpType popUpType, Action onComplete = null)
