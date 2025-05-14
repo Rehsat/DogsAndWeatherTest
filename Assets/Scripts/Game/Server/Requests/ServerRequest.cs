@@ -7,18 +7,21 @@ using UnityEngine.Networking;
 
 namespace Game.Server.Requests
 {
-    public abstract class RequestSender : IDisposable
+    public class ServerRequest : IDisposable
     {
-        protected string RequestURL { get; }
         private UnityWebRequest _activeRequest;
+        private readonly Action<DownloadHandler> _callback;
 
-        public RequestSender(string requestURL)
+        private string _requestURL;
+        public ServerRequest(string requestURL, Action<DownloadHandler> callback)
         {
-            RequestURL = requestURL;
+            _requestURL = requestURL;
+            _callback = callback;
         }
+        
         public IEnumerator SendRequestAsync(CancellationToken cancellationToken)
         {
-            using (_activeRequest = new UnityWebRequest(RequestURL))
+            using (_activeRequest = new UnityWebRequest(_requestURL))
             {
                 _activeRequest.downloadHandler = new DownloadHandlerBuffer();
 
@@ -27,11 +30,12 @@ namespace Game.Server.Requests
                 if (_activeRequest.isNetworkError || _activeRequest.isHttpError)
                     Debug.LogError(_activeRequest.error);
                 else
-                    OnComplete(_activeRequest.downloadHandler.text);
+                    OnComplete(_activeRequest.downloadHandler);
 
                 Clear();
             }
         }
+        
         private IEnumerator WaitUntilComplete(UnityWebRequest request, CancellationToken cancellationToken)
         {
             var operation = request.SendWebRequest();
@@ -62,7 +66,11 @@ namespace Game.Server.Requests
             _activeRequest = null;
         }
 
-        protected abstract void OnComplete(string serverCallback);
+        
+        private void OnComplete(DownloadHandler serverCallback)
+        {
+            _callback.Invoke(serverCallback);
+        }
 
         public void Dispose()
         {

@@ -14,8 +14,8 @@ namespace Game.GameStateMachine
 {
     public class WeatherDataCollectState : IGameState, IDisposable
     {
-        private readonly RequestSendHandler _requestSendHandler;
-        private readonly IServerCallbackHandler<WeatherData> _serverCallbackHandler;
+        private readonly ServerRequestsSender _serverRequestsSender;
+        private readonly IServerCallbackHandler<WeatherPeriod> _serverCallbackHandler;
 
         private GameStateMachine _stateMachine;
         private WeatherViewUI _weatherViewUI;
@@ -25,11 +25,11 @@ namespace Game.GameStateMachine
 
         private const int REQUEST_INTERVAL_SECONDS = 5;
         public WeatherDataCollectState(IFactory<WeatherViewUI> weatherViewFactory
-            ,IServerCallbackHandler<WeatherData> serverCallbackHandler
-            ,RequestSendHandler requestSendHandler)
+            ,IServerCallbackHandler<WeatherPeriod> serverCallbackHandler
+            ,ServerRequestsSender serverRequestsSender)
         {
             _serverCallbackHandler = serverCallbackHandler;
-            _requestSendHandler = requestSendHandler;
+            _serverRequestsSender = serverRequestsSender;
             
             _weatherViewUI = weatherViewFactory.Create();
             _weatherController = new WeatherController(serverCallbackHandler, _weatherViewUI);
@@ -51,15 +51,15 @@ namespace Game.GameStateMachine
 
         private void SendGetWeatherDataRequest()
         {
-            var request = new WeatherRequestSender(_serverCallbackHandler.HandleServerCallback);
-            _requestSendHandler.AddRequest(request);
+            var request = new WeatherServerRequest(_serverCallbackHandler.HandleServerCallback);
+            _serverRequestsSender.AddRequest(request);
         }
         
         public void Exit()
         {
             _weatherViewUI.gameObject.SetActive(false);
             _compositeDisposable?.Dispose();
-            _requestSendHandler.CancelCurrentRequest();
+            _serverRequestsSender.CancelCurrentRequest();
         }
 
         public void Dispose()

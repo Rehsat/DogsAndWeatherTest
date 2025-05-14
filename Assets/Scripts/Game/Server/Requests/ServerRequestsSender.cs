@@ -5,23 +5,23 @@ using UnityEngine;
 
 namespace Game.Server.Requests
 {
-    public class RequestSendHandler
+    public class ServerRequestsSender
     {
         private CoroutineHandler _coroutineHandler;
-        private Queue<RequestSender> _requestsQueue;
-        private RequestSender _currentRequest;
+        private Queue<ServerRequest> _requestsQueue;
+        private ServerRequest _currentServerRequest;
         private CancellationTokenSource _currentCancellationTokenSource;
         private Coroutine _currentCoroutine;
 
-        public RequestSendHandler(CoroutineHandler coroutineHandler)
+        public ServerRequestsSender(CoroutineHandler coroutineHandler)
         {
             _coroutineHandler = coroutineHandler;
-            _requestsQueue = new Queue<RequestSender>();
+            _requestsQueue = new Queue<ServerRequest>();
         }
 
-        public void AddRequest(RequestSender request)
+        public void AddRequest(ServerRequest serverRequest)
         {
-            _requestsQueue.Enqueue(request);
+            _requestsQueue.Enqueue(serverRequest);
         
             if (_currentCoroutine == null)
                 _currentCoroutine = _coroutineHandler.StartNewCoroutine(ProcessQueue());
@@ -31,10 +31,10 @@ namespace Game.Server.Requests
         {
             while (_requestsQueue.Count > 0)
             {
-                _currentRequest = _requestsQueue.Dequeue();
+                _currentServerRequest = _requestsQueue.Dequeue();
                 _currentCancellationTokenSource = new CancellationTokenSource();
             
-                yield return _currentRequest.SendRequestAsync(_currentCancellationTokenSource.Token);
+                yield return _currentServerRequest.SendRequestAsync(_currentCancellationTokenSource.Token);
                 ClearCurrentRequest();
             }
         
@@ -43,18 +43,18 @@ namespace Game.Server.Requests
 
         private void ClearCurrentRequest()
         {
-            _currentRequest.Dispose();
+            _currentServerRequest.Dispose();
             _currentCancellationTokenSource.Dispose();
-            _currentRequest = null;
+            _currentServerRequest = null;
             _currentCancellationTokenSource = null;
         }
 
         public void CancelCurrentRequest()
         {
             _currentCancellationTokenSource?.Cancel();
-            _currentRequest?.CancelRequest();
-            _currentRequest?.Dispose();
-            _currentRequest = null;
+            _currentServerRequest?.CancelRequest();
+            _currentServerRequest?.Dispose();
+            _currentServerRequest = null;
         }
 
         public void CancelAllRequests()

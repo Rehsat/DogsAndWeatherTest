@@ -11,6 +11,7 @@ namespace Game.UI.Weather
 
         public void SetIcon(Sprite icon)
         {
+            _weatherIcon.gameObject.SetActive(icon != null);
             _weatherIcon.sprite = icon;
         }
 

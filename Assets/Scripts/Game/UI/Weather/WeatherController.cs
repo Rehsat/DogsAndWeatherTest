@@ -1,5 +1,6 @@
 ﻿using Game.Server.Parsers.Weather;
 using Game.Server.Requests;
+using UniRx;
 using UnityEngine;
 
 namespace Game.UI.Weather
@@ -7,18 +8,21 @@ namespace Game.UI.Weather
     public class WeatherController
     {
         private readonly IWeatherView _weatherView;
-
-        public WeatherController(IServerCallbackHandler<WeatherData> observer, IWeatherView weatherView)
+        private CompositeDisposable _currentWeatherDataDisposable;
+        public WeatherController(IServerCallbackHandler<WeatherPeriod> observer, IWeatherView weatherView)
         {
             _weatherView = weatherView;
             observer.OnNewDataFromServer.SubscribeWithSkip(SetData);
         }
 
-        public void SetData(WeatherData weatherData)
+        public void SetData(WeatherPeriod currentWeatherData)
         {
-            var currentWeatherData = weatherData.Properties.Periods[0]; 
             var text = $"Сегодня - {currentWeatherData.Temperature}{currentWeatherData.TemperatureUnit}";
             _weatherView.SetText(text);
+            
+            _currentWeatherDataDisposable?.Dispose();
+            _currentWeatherDataDisposable= new CompositeDisposable();
+            currentWeatherData.Sprite.Subscribe(_weatherView.SetIcon);
         }
     }
 }

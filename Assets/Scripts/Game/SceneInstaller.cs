@@ -38,9 +38,9 @@ namespace Game
 
         private void InstallServer()
         {
-            Container.Bind<RequestSendHandler>().FromNew().AsSingle();
+            Container.Bind<ServerRequestsSender>().FromNew().AsSingle();
 
-            Container.Bind<IServerCallbackHandler<WeatherData>>().To<WeatherCallbackHandler>().FromNew().AsSingle();
+            Container.Bind<IServerCallbackHandler<WeatherPeriod>>().To<WeatherCallbackHandler>().FromNew().AsSingle();
         }
 
         private void InstallStateMachine()

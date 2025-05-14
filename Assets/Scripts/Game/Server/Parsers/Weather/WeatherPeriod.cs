@@ -1,5 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
+using UniRx;
+using UnityEngine;
 
 namespace Game.Server.Parsers.Weather
 {
@@ -46,6 +48,12 @@ namespace Game.Server.Parsers.Weather
     
         [JsonProperty("detailedForecast")]
         public string DetailedForecast { get; }
+        
+
+        //Думаю правильнее было бы создать оотдельный класс,в котором хранилась бы оотдельно дата, отдельно спрайт,
+        //но думаю слишком мало чего изменится, а время терять не хотелось бы
+        private ReactiveProperty<Sprite> _currentSprite;
+        public IReadOnlyReactiveProperty<Sprite> Sprite => _currentSprite;
 
         [JsonConstructor]
         public WeatherPeriod(
@@ -78,6 +86,12 @@ namespace Game.Server.Parsers.Weather
             Icon = icon ?? throw new ArgumentNullException(nameof(icon));
             ShortForecast = shortForecast ?? throw new ArgumentNullException(nameof(shortForecast));
             DetailedForecast = detailedForecast ?? throw new ArgumentNullException(nameof(detailedForecast));
+            _currentSprite = new ReactiveProperty<Sprite>();
+        }
+
+        public void SetSprite(Sprite sprite)
+        {
+            _currentSprite.Value = sprite;
         }
     }
 }
