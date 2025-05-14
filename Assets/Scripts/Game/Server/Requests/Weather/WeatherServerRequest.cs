@@ -13,18 +13,4 @@ namespace Game.Server.Requests.Weather
         {
         }
     }
-    public class DogsDataServerRequest : ServerRequest
-    {
-        public const string DOGS_URL = "https://dogapi.dog/api/v2/breeds"; 
-        public DogsDataServerRequest(Action<DownloadHandler> callback) : base(DOGS_URL, callback)
-        {
-        }
-    }
-    public class DogBreedServerRequest : ServerRequest
-    {
-        public DogBreedServerRequest(string dogId, Action<DownloadHandler> callback) :
-            base($"{DogsDataServerRequest.DOGS_URL}/{dogId}", callback)
-        {
-        }
-    }
 }

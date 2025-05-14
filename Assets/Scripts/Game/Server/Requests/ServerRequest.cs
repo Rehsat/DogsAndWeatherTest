@@ -10,18 +10,22 @@ namespace Game.Server.Requests
     public class ServerRequest : IDisposable
     {
         private UnityWebRequest _activeRequest;
+        
         private readonly Action<DownloadHandler> _callback;
 
-        private string _dogId;
-        public ServerRequest(string dogId, Action<DownloadHandler> callback)
+        private string _url;
+
+        public string URL => _url;
+
+        public ServerRequest(string url, Action<DownloadHandler> callback)
         {
-            _dogId = dogId;
+            _url = url;
             _callback = callback;
         }
         
         public IEnumerator SendRequestAsync(CancellationToken cancellationToken)
         {
-            using (_activeRequest = new UnityWebRequest(_dogId))
+            using (_activeRequest = new UnityWebRequest(_url))
             {
                 yield return HandleRequestSend(_activeRequest, cancellationToken);
             }
@@ -33,10 +37,17 @@ namespace Game.Server.Requests
 
             yield return WaitUntilComplete(request, cancellationToken);
 
-            if (request.isNetworkError || request.isHttpError)
-                Debug.LogError(_activeRequest.error);
-            else
-                OnComplete(request.downloadHandler);
+            try
+            {
+                if (request.isNetworkError || request.isHttpError)
+                    Debug.LogError(_activeRequest.error);
+                else
+                    OnComplete(request.downloadHandler);
+            }
+            catch 
+            {
+                Debug.LogError("request was canceled");
+            }
 
             Clear();
         }

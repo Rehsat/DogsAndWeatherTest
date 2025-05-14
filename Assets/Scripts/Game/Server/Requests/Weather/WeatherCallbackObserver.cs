@@ -33,7 +33,7 @@ namespace Game.Server.Requests.Weather
         public void HandleServerCallback(DownloadHandler callback)
         {
             var result = _serverDataParser.Parse(callback.text);
-            _currentPeriod = result.Properties.Periods[0];
+            _currentPeriod = result.Properties.Periods[0]; // Не успел добавить поиск правильного времени, поэтому беру первый :(
             _onNewDataFromServer.Notify(_currentPeriod);
 
             SendGetSpriteRequest(_currentPeriod.Icon);

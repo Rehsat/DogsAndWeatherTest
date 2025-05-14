@@ -37,7 +37,7 @@ namespace Game.GameStateMachine
         
         public void Enter()
         {
-            var dogsRequest = new DogsDataServerRequest(_serverCallbackHandler.HandleServerCallback);
+            var dogsRequest = new DogsListServerRequest(_serverCallbackHandler.HandleServerCallback);
             _serverRequestsSender.AddRequest(dogsRequest);
         }
 

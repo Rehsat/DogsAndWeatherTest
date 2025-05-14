@@ -12,7 +12,7 @@ namespace Game.UI.Dogs
     public class DogsListPresenter : IDisposable
     {
         private readonly BaseObjectPool<DogDataButtonView> _dogsUIViewPool;
-        private readonly ServerRequestsSender _requestsSenders;
+        private readonly ServerRequestsSender _requestsSender;
         private readonly IServerCallbackHandler<BreedResponse> _breedDataCallbackHandler;
         private readonly List<DogDataButtonView> _activeViews;
 
@@ -22,17 +22,18 @@ namespace Game.UI.Dogs
         
         private CompositeDisposable _viewsCompositeDisposable;
         private CompositeDisposable _presenterCompositeDisposable;
-        
+
+        private DogBreedServerRequest _lastDogBreedServerRequest;
         private const int MAX_DOG_VIEWS = 10;
         
         public DogsListPresenter(
             IServerCallbackHandler<DogBreedsDataResponse> dogsDataCallbackHandler
             ,BaseObjectPool<DogDataButtonView> dogsUIViewPool
-            ,ServerRequestsSender requestsSenders
+            ,ServerRequestsSender requestsSender
             ,IServerCallbackHandler<BreedResponse> breedDataCallbackHandler)
         {
             _dogsUIViewPool = dogsUIViewPool;
-            _requestsSenders = requestsSenders;
+            _requestsSender = requestsSender;
             _breedDataCallbackHandler = breedDataCallbackHandler;
             
             _dogButtons = new List<DogDataButtonView>();
@@ -82,7 +83,8 @@ namespace Game.UI.Dogs
         private void SendBreedDataRequest(string id)
         {
             var request = new DogBreedServerRequest(id, HandleBreedResponse);
-            _requestsSenders.AddRequest(request);
+            _lastDogBreedServerRequest = request;
+            _requestsSender.AddRequest(request);
         }
 
         private void HandleBreedResponse(DownloadHandler downloadHandler)
@@ -105,6 +107,12 @@ namespace Game.UI.Dogs
             _dogButtons.ForEach(view => _dogsUIViewPool.Return(view));
             _viewsCompositeDisposable?.Dispose();
             _viewsCompositeDisposable = new CompositeDisposable();
+            
+            StopLoadingDogView();
+            _requestsSender.TryCancelRequestWithURL(DogsListServerRequest.DOGS_URL);
+            
+            if (_lastDogBreedServerRequest != null)
+                _requestsSender.TryCancelRequestWithURL(_lastDogBreedServerRequest.URL);
         }
 
         public void Dispose()

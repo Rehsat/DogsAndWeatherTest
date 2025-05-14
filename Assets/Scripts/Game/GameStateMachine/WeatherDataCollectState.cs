@@ -17,9 +17,7 @@ namespace Game.GameStateMachine
         private readonly ServerRequestsSender _serverRequestsSender;
         private readonly IServerCallbackHandler<WeatherPeriod> _serverCallbackHandler;
 
-        private GameStateMachine _stateMachine;
         private WeatherViewUI _weatherViewUI;
-        private WeatherController _weatherController;
 
         private CompositeDisposable _compositeDisposable;
 
@@ -32,17 +30,14 @@ namespace Game.GameStateMachine
             _serverRequestsSender = serverRequestsSender;
             
             _weatherViewUI = weatherViewFactory.Create();
-            _weatherController = new WeatherController(serverCallbackHandler, _weatherViewUI);
-        }
-        public void SetStateMachine(GameStateMachine stateMachine)
-        {
-            _stateMachine = stateMachine;
+            var weatherController = new WeatherController(serverCallbackHandler, _weatherViewUI);
         }
         public void Enter()
         {
             _compositeDisposable = new CompositeDisposable();
             _weatherViewUI.gameObject.SetActive(true);
-        
+
+            SendGetWeatherDataRequest(); //Не уверен надо ли без ожидания 5и секунд делать, не увидел в ТЗ, но по логике надо
             Observable
                 .Interval(TimeSpan.FromSeconds(REQUEST_INTERVAL_SECONDS))
                 .Subscribe(l =>SendGetWeatherDataRequest())
@@ -59,12 +54,15 @@ namespace Game.GameStateMachine
         {
             _weatherViewUI.gameObject.SetActive(false);
             _compositeDisposable?.Dispose();
-            _serverRequestsSender.CancelCurrentRequest();
+            _serverRequestsSender.TryCancelRequestWithURL(WeatherServerRequest.WEATHER_URL);
         }
 
         public void Dispose()
         {
             _compositeDisposable?.Dispose();
+        }
+        public void SetStateMachine(GameStateMachine stateMachine)
+        {
         }
     }
 }
