@@ -1,23 +1,50 @@
-using System.Collections;
-using System.Collections.Generic;
+using Game.Configs;
+using Game.Factories;
 using Game.GameStateMachine;
+using Game.Server.Requests;
 using UnityEngine;
 using Zenject;
 
-public class SceneInstaller : MonoInstaller
+namespace Game
 {
-    public override void InstallBindings()
+    public class SceneInstaller : MonoInstaller
     {
-        InstallStateMachine();
-    }
+        [SerializeField] private CoroutineHandler _coroutineHandler;
+        [SerializeField] private Canvas _mainCanvas; //можно сделать хранилище с несолькими канвасами,чтоб делить по слоям. Но тут это без надобности
+        [SerializeField] private PrefabsContainer _prefabsContainer;
+        public override void InstallBindings()
+        {
+            InstallInstances();
+            InstallFactories();
+            InstallServer();
+            InstallStateMachine();
+        }
 
-    private void InstallStateMachine()
-    {
-        Container.Bind<IGameState>().To<BootstrapGameState>().AsSingle();
-        Container.Bind<IGameState>().To<WeatherDataCollectState>().AsSingle();
+        private void InstallInstances()
+        {
+            Container.BindInstance(_coroutineHandler).AsSingle().NonLazy();
+            Container.BindInstance(_mainCanvas).AsSingle().NonLazy();
+            Container.BindInstance(_prefabsContainer).AsSingle().NonLazy();
+        }
 
-        Container.Bind<GameStateMachine>().FromNew().AsSingle().NonLazy();
+        private void InstallFactories()
+        {
+            Container.BindInterfacesAndSelfTo<WeatherViewFactory>().FromNew().AsSingle();
+        }
+
+        private void InstallServer()
+        {
+            Container.Bind<RequestSendHandler>().FromNew().AsSingle();
+        }
+
+        private void InstallStateMachine()
+        {
+            Container.Bind<IGameState>().To<BootstrapGameState>().AsSingle();
+            Container.Bind<IGameState>().To<WeatherDataCollectState>().AsSingle();
+
+            Container.Bind<GameStateMachine.GameStateMachine>().FromNew().AsSingle().NonLazy();
         
-        Container.Bind<CurrentGameStateObserver>().FromNew().AsSingle();
+            Container.Bind<CurrentGameStateObserver>().FromNew().AsSingle();
+        }
     }
 }

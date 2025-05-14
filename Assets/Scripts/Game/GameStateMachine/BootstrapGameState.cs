@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using Game.Server.Parsers.Dogs;
 using Game.Server.Parsers.Weather;
 using UniRx;
 using UnityEngine;
@@ -15,23 +16,8 @@ namespace Game.GameStateMachine
         }
         public void Enter()
         {
-            Debug.LogError(124);
-            Observable.TimerFrame(1).Subscribe((l =>
-            {
-                CoroutineStarter.Instance.StartCoroutine2(this);
-            }));
-            // _stateMachine.EnterState<WeatherDataCollectState>();
+            _stateMachine.EnterState<WeatherDataCollectState>();
         }
-
-        public IEnumerator GetData()
-        {
-            var parser = new WeatherDataParser();
-            using var request = UnityWebRequest.Get("https://api.weather.gov/gridpoints/TOP/32,81/forecast");
-            yield return request.SendWebRequest();
-            var resultServer = request.downloadHandler.text;
-            var result = parser.Parse(resultServer);
-        }
-
         public void Exit()
         {
         }

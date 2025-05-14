@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Game.Server.Parsers.Dogs
 {
-    public class BreedResponse //TODO Weight Range LifeSpan
+    public class DogBreedsDataResponse //TODO Weight Range LifeSpan
     {
         [JsonProperty("data")]
         public List<BreedData> Data { get; set; }

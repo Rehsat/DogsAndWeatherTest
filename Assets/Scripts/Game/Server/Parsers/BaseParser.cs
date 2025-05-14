@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace Game.Server.Parsers
 {
-    public abstract class BaseParser<TReturnType> : IParser<TReturnType>
+    public class BaseParser<TReturnType> : IParser<TReturnType>
     {
         private JsonSerializer _jsonSerializer;
         
