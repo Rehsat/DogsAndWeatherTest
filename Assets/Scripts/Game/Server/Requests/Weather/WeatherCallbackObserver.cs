@@ -39,7 +39,7 @@ namespace Game.Server.Requests.Weather
                 .OrderBy(period => period.StartTime)
                 .ToList();
     
-            var now = DateTimeOffset.UtcNow; // буквально в последнюю минуту сгенерировал нейронкой XD, вроде работает
+            var now = DateTimeOffset.UtcNow; // буквально в последнюю минуту сгенерировал нейронкой XD, вроде работает. От сюда
             _currentPeriod = orderedPeriods.FirstOrDefault(p => now >= p.StartTime && now <= p.EndTime);
 
             if (_currentPeriod == null)
@@ -47,7 +47,7 @@ namespace Game.Server.Requests.Weather
                 _currentPeriod = orderedPeriods.FirstOrDefault(p => p.StartTime > now) 
                                  ?? orderedPeriods.Last(); 
             }
-            
+                                                         // вот до сюда
             _onNewDataFromServer.Notify(_currentPeriod);
             SendGetSpriteRequest(_currentPeriod.Icon);
         }
