@@ -1,4 +1,6 @@
-﻿using EasyFramework.ReactiveEvents;
+﻿using System;
+using System.Linq;
+using EasyFramework.ReactiveEvents;
 using Game.Server.Parsers;
 using Game.Server.Parsers.Weather;
 using UnityEngine.Networking;
@@ -33,9 +35,20 @@ namespace Game.Server.Requests.Weather
         public void HandleServerCallback(DownloadHandler callback)
         {
             var result = _serverDataParser.Parse(callback.text);
-            _currentPeriod = result.Properties.Periods[0]; // Не успел добавить поиск правильного времени, поэтому беру первый :(
-            _onNewDataFromServer.Notify(_currentPeriod);
+            var orderedPeriods = result.Properties.Periods
+                .OrderBy(period => period.StartTime)
+                .ToList();
+    
+            var now = DateTimeOffset.UtcNow; // буквально в последнюю минуту сгенерировал нейронкой XD, вроде работает
+            _currentPeriod = orderedPeriods.FirstOrDefault(p => now >= p.StartTime && now <= p.EndTime);
 
+            if (_currentPeriod == null)
+            {
+                _currentPeriod = orderedPeriods.FirstOrDefault(p => p.StartTime > now) 
+                                 ?? orderedPeriods.Last(); 
+            }
+            
+            _onNewDataFromServer.Notify(_currentPeriod);
             SendGetSpriteRequest(_currentPeriod.Icon);
         }
 
