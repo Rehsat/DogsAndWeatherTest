@@ -1,23 +1,18 @@
 using Game.Configs;
 using Game.UI.Weather;
 using UnityEngine;
-using Zenject;
 
 namespace Game.Factories
 {
-    public class WeatherViewFactory : IFactory<WeatherViewUI>
+    public class WeatherViewFactory : SimpleUIFactory<WeatherViewUI>
     {
-        private readonly Canvas _mainCanvas;
-        private readonly WeatherViewUI _weatherViewUI;
-        
-        public WeatherViewFactory(PrefabsContainer prefabsContainer, Canvas mainCanvas)
+        public WeatherViewFactory(PrefabsContainer prefabsContainer, Canvas mainCanvas) : base(prefabsContainer, mainCanvas)
         {
-            _mainCanvas = mainCanvas;
-            _weatherViewUI = prefabsContainer.GetPrefabsComponent<WeatherViewUI>(Prefab.WeatherUI);
         }
-        public WeatherViewUI  Create()
+
+        protected override Prefab GetPrefabType()
         {
-            return Object.Instantiate(_weatherViewUI, _mainCanvas.transform);
+            return Prefab.WeatherUI;
         }
     }
 }

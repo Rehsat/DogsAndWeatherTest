@@ -29,7 +29,8 @@ namespace Game.Configs
 
     public enum Prefab
     {
-        WeatherUI = 0
+        WeatherUI = 0,
+        PanelSwitchView = 1,
         
     }
 }

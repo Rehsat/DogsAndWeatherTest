@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace Game.Server.Parsers.Weather
 {
-    public class GeoFeature
+    public class WeatherData
     {
         [JsonProperty("@context")]
         public IReadOnlyList<object> Context { get; }
@@ -19,7 +19,7 @@ namespace Game.Server.Parsers.Weather
         public WeatherProperties Properties { get; }
 
         [JsonConstructor]
-        public GeoFeature(
+        public WeatherData(
             IReadOnlyList<object> context,
             string type,
             Geometry geometry,

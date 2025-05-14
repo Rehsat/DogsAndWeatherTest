@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Game.Server.Requests
+namespace Game.Server.Requests.Weather
 {
     public class WeatherRequestSender : RequestSender
     {

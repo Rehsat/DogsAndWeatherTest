@@ -10,6 +10,7 @@ namespace Game.GameStateMachine
         private ReactiveProperty<IState> _currentState;
         private ReactiveEvent<IState> _onStateChange;
         private CompositeDisposable _compositeDisposable;
+        private Type _currentStateType;
     
         protected Dictionary<Type, TStateType> States;
 
@@ -33,6 +34,12 @@ namespace Game.GameStateMachine
         public void EnterState<TState>() where TState : TStateType
         {
             var stateType = typeof(TState);
+            TryEnterState(stateType);
+        }
+
+        public void TryEnterState(Type stateType)
+        {
+            if(_currentStateType == stateType) return;
             if (States.ContainsKey(stateType))
             {
                 _currentState.Value.Exit();

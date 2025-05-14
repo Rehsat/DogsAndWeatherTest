@@ -4,6 +4,7 @@ using Game.Server.Parsers;
 using Game.Server.Parsers.Dogs;
 using Game.Server.Parsers.Weather;
 using Game.Server.Requests;
+using Game.Server.Requests.Weather;
 using Game.UI.Weather;
 using UniRx;
 using UnityEngine.Networking;
@@ -13,9 +14,8 @@ namespace Game.GameStateMachine
 {
     public class WeatherDataCollectState : IGameState, IDisposable
     {
-        //TODO Выделить отдельную сущность под запросы реквестов
         private readonly RequestSendHandler _requestSendHandler;
-        private readonly BaseParser<GeoFeature> _serverDataParser;
+        private readonly IServerCallbackHandler<WeatherData> _serverCallbackHandler;
 
         private GameStateMachine _stateMachine;
         private WeatherViewUI _weatherViewUI;
@@ -23,15 +23,16 @@ namespace Game.GameStateMachine
 
         private CompositeDisposable _compositeDisposable;
 
-        private const int REQUEST_INTERVAL_SECONDS = 1;
-        public WeatherDataCollectState(IFactory<WeatherViewUI> weatherViewFactory, RequestSendHandler requestSendHandler)
+        private const int REQUEST_INTERVAL_SECONDS = 5;
+        public WeatherDataCollectState(IFactory<WeatherViewUI> weatherViewFactory
+            ,IServerCallbackHandler<WeatherData> serverCallbackHandler
+            ,RequestSendHandler requestSendHandler)
         {
+            _serverCallbackHandler = serverCallbackHandler;
             _requestSendHandler = requestSendHandler;
-            _serverDataParser = new BaseParser<GeoFeature>();
-            _compositeDisposable = new CompositeDisposable();
             
             _weatherViewUI = weatherViewFactory.Create();
-            _weatherController = new WeatherController(_weatherViewUI);
+            _weatherController = new WeatherController(serverCallbackHandler, _weatherViewUI);
         }
         public void SetStateMachine(GameStateMachine stateMachine)
         {
@@ -39,6 +40,7 @@ namespace Game.GameStateMachine
         }
         public void Enter()
         {
+            _compositeDisposable = new CompositeDisposable();
             _weatherViewUI.gameObject.SetActive(true);
         
             Observable
@@ -49,19 +51,15 @@ namespace Game.GameStateMachine
 
         private void SendGetWeatherDataRequest()
         {
-            var request = new WeatherRequestSender(HandleWeatherDataCallback);
+            var request = new WeatherRequestSender(_serverCallbackHandler.HandleServerCallback);
             _requestSendHandler.AddRequest(request);
-        }
-
-        private void HandleWeatherDataCallback(string callback)
-        {
-            var result = _serverDataParser.Parse(callback);
-            _weatherController.SetData(result);
         }
         
         public void Exit()
         {
             _weatherViewUI.gameObject.SetActive(false);
+            _compositeDisposable?.Dispose();
+            _requestSendHandler.CancelCurrentRequest();
         }
 
         public void Dispose()
@@ -69,5 +67,4 @@ namespace Game.GameStateMachine
             _compositeDisposable?.Dispose();
         }
     }
-    
 }

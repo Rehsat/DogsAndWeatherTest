@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _prefabs:
     m_val: 7
-    m_keys: 00000000
+    m_keys: 0000000001000000
     m_values:
     - {fileID: 4376621440544537586, guid: 3d33ac8c864a4b14cbbc8db925c7aa6c, type: 3}
+    - {fileID: 7494662900704965897, guid: 254b75b6c5d061d4d949b9c36658b287, type: 3}

@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Game.Server.Parsers.Weather
 {
-    public class WeatherDataParser :  BaseParser<GeoFeature>
+    public class WeatherDataParser :  BaseParser<WeatherData>
     {
     }
 

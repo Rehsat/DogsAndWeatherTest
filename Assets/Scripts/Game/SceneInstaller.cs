@@ -1,7 +1,10 @@
 using Game.Configs;
 using Game.Factories;
 using Game.GameStateMachine;
+using Game.Server.Parsers.Weather;
 using Game.Server.Requests;
+using Game.Server.Requests.Weather;
+using Game.UI.Weather;
 using UnityEngine;
 using Zenject;
 
@@ -30,18 +33,22 @@ namespace Game
         private void InstallFactories()
         {
             Container.BindInterfacesAndSelfTo<WeatherViewFactory>().FromNew().AsSingle();
+            Container.BindInterfacesAndSelfTo<PanelSwitchFactory>().FromNew().AsSingle();
         }
 
         private void InstallServer()
         {
             Container.Bind<RequestSendHandler>().FromNew().AsSingle();
+
+            Container.Bind<IServerCallbackHandler<WeatherData>>().To<WeatherCallbackHandler>().FromNew().AsSingle();
         }
 
         private void InstallStateMachine()
         {
             Container.Bind<IGameState>().To<BootstrapGameState>().AsSingle();
             Container.Bind<IGameState>().To<WeatherDataCollectState>().AsSingle();
-
+            Container.Bind<IGameState>().To<DogsDataCollectState>().AsSingle();
+            
             Container.Bind<GameStateMachine.GameStateMachine>().FromNew().AsSingle().NonLazy();
         
             Container.Bind<CurrentGameStateObserver>().FromNew().AsSingle();

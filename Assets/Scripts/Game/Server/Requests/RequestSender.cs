@@ -32,7 +32,6 @@ namespace Game.Server.Requests
                 Clear();
             }
         }
-
         private IEnumerator WaitUntilComplete(UnityWebRequest request, CancellationToken cancellationToken)
         {
             var operation = request.SendWebRequest();
@@ -52,7 +51,7 @@ namespace Game.Server.Requests
         {
             if (_activeRequest != null)
             {
-               // _activeRequest.Abort();
+                _activeRequest.Abort();
                 Clear();
             }
         }
@@ -60,6 +59,7 @@ namespace Game.Server.Requests
         private void Clear()
         {
             _activeRequest?.Dispose();
+            _activeRequest = null;
         }
 
         protected abstract void OnComplete(string serverCallback);

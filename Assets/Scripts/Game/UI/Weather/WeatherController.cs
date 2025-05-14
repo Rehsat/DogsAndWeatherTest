@@ -1,4 +1,5 @@
 ﻿using Game.Server.Parsers.Weather;
+using Game.Server.Requests;
 using UnityEngine;
 
 namespace Game.UI.Weather
@@ -7,16 +8,16 @@ namespace Game.UI.Weather
     {
         private readonly IWeatherView _weatherView;
 
-        public WeatherController(IWeatherView weatherView)
+        public WeatherController(IServerCallbackHandler<WeatherData> observer, IWeatherView weatherView)
         {
             _weatherView = weatherView;
+            observer.OnNewDataFromServer.SubscribeWithSkip(SetData);
         }
 
-        public void SetData(GeoFeature geoFeature)
+        public void SetData(WeatherData weatherData)
         {
-            var currentWeatherData = geoFeature.Properties.Periods[0]; 
-            //так понимаю TemeratureTrend будет минус при минусовой погоде
-            var text = $"Сегодня - {currentWeatherData.TemperatureTrend}{currentWeatherData.Temperature}{currentWeatherData.TemperatureUnit}";
+            var currentWeatherData = weatherData.Properties.Periods[0]; 
+            var text = $"Сегодня - {currentWeatherData.Temperature}{currentWeatherData.TemperatureUnit}";
             _weatherView.SetText(text);
         }
     }
