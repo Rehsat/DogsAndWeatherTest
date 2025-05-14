@@ -31,6 +31,8 @@ namespace Game.Configs
     {
         WeatherUI = 0,
         PanelSwitchView = 1,
+        DogList = 2,
+        DogButtonView = 3
         
     }
 }

@@ -1,9 +1,12 @@
 using Game.Configs;
 using Game.Factories;
+using Game.Factories.ObjectPool;
 using Game.GameStateMachine;
+using Game.Server.Parsers.Dogs;
 using Game.Server.Parsers.Weather;
 using Game.Server.Requests;
 using Game.Server.Requests.Weather;
+using Game.UI.Dogs;
 using Game.UI.Weather;
 using UnityEngine;
 using Zenject;
@@ -20,6 +23,7 @@ namespace Game
             InstallInstances();
             InstallFactories();
             InstallServer();
+            InstallPresenters();
             InstallStateMachine();
         }
 
@@ -34,6 +38,10 @@ namespace Game
         {
             Container.BindInterfacesAndSelfTo<WeatherViewFactory>().FromNew().AsSingle();
             Container.BindInterfacesAndSelfTo<PanelSwitchFactory>().FromNew().AsSingle();
+            Container.BindInterfacesAndSelfTo<DogListFactory>().FromNew().AsSingle();
+            Container.BindInterfacesAndSelfTo<DogButtonsUiViewFactory>().FromNew().AsSingle();
+
+            Container.BindInterfacesAndSelfTo<BaseObjectPool<DogDataButtonView>>().FromNew().AsSingle();
         }
 
         private void InstallServer()
@@ -41,8 +49,13 @@ namespace Game
             Container.Bind<ServerRequestsSender>().FromNew().AsSingle();
 
             Container.Bind<IServerCallbackHandler<WeatherPeriod>>().To<WeatherCallbackHandler>().FromNew().AsSingle();
+            Container.Bind<IServerCallbackHandler<DogBreedsDataResponse>>().To<DogsCallbackHandler>().FromNew().AsSingle();
         }
 
+        private void InstallPresenters()
+        {
+            Container.Bind<DogsListPresenter>().FromNew().AsSingle();
+        }
         private void InstallStateMachine()
         {
             Container.Bind<IGameState>().To<BootstrapGameState>().AsSingle();

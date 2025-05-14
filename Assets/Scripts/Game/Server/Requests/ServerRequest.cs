@@ -12,28 +12,33 @@ namespace Game.Server.Requests
         private UnityWebRequest _activeRequest;
         private readonly Action<DownloadHandler> _callback;
 
-        private string _requestURL;
-        public ServerRequest(string requestURL, Action<DownloadHandler> callback)
+        private string _dogId;
+        public ServerRequest(string dogId, Action<DownloadHandler> callback)
         {
-            _requestURL = requestURL;
+            _dogId = dogId;
             _callback = callback;
         }
         
         public IEnumerator SendRequestAsync(CancellationToken cancellationToken)
         {
-            using (_activeRequest = new UnityWebRequest(_requestURL))
+            using (_activeRequest = new UnityWebRequest(_dogId))
             {
-                _activeRequest.downloadHandler = new DownloadHandlerBuffer();
-
-                yield return WaitUntilComplete(_activeRequest, cancellationToken);
-
-                if (_activeRequest.isNetworkError || _activeRequest.isHttpError)
-                    Debug.LogError(_activeRequest.error);
-                else
-                    OnComplete(_activeRequest.downloadHandler);
-
-                Clear();
+                yield return HandleRequestSend(_activeRequest, cancellationToken);
             }
+        }
+
+        private IEnumerator HandleRequestSend(UnityWebRequest request, CancellationToken cancellationToken)
+        {
+            request.downloadHandler = new DownloadHandlerBuffer();
+
+            yield return WaitUntilComplete(request, cancellationToken);
+
+            if (request.isNetworkError || request.isHttpError)
+                Debug.LogError(_activeRequest.error);
+            else
+                OnComplete(request.downloadHandler);
+
+            Clear();
         }
         
         private IEnumerator WaitUntilComplete(UnityWebRequest request, CancellationToken cancellationToken)

@@ -1,8 +1,6 @@
 ﻿using EasyFramework.ReactiveEvents;
 using Game.Server.Parsers;
 using Game.Server.Parsers.Weather;
-using Game.Server.Requests;
-using UnityEngine;
 using UnityEngine.Networking;
 
 namespace Game.Server.Requests.Weather
@@ -45,36 +43,6 @@ namespace Game.Server.Requests.Weather
         {
             var request = new ServerRequest(spriteURL, _spriteCallbackHandler.HandleServerCallback);
             _serverRequestsSender.AddRequest(request);
-        }
-    }
-}
-
-public class SpriteCallbackHandler : IServerCallbackHandler<Sprite>
-{
-    private readonly ReactiveEvent<Sprite> _onNewDataFromServer;
-    public IReadOnlyReactiveEvent<Sprite> OnNewDataFromServer => _onNewDataFromServer;
-
-    public SpriteCallbackHandler()
-    {
-        _onNewDataFromServer = new ReactiveEvent<Sprite>();
-    }
-    public void HandleServerCallback(DownloadHandler callback)
-    {
-        byte[] imageData = callback.data; // Получаем сырые данные
-        Texture2D texture = new Texture2D(2, 2);
-    
-        if (texture.LoadImage(imageData)) // Автоматически определяет формат (PNG/JPG)
-        {
-            var newSprite = Sprite.Create(
-                texture,
-                new Rect(0, 0, texture.width, texture.height),
-                new Vector2(0.5f, 0.5f)
-            );
-            _onNewDataFromServer.Notify(newSprite);
-        }
-        else
-        {
-            Debug.LogError("Failed to load texture from downloaded data");
         }
     }
 }

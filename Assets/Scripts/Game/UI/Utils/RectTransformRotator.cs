@@ -1,15 +1,16 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class RectTransformRotator : MonoBehaviour
+namespace Game.UI.Utils
 {
-    [SerializeField] private float _rotationSpeed = 90f;
-    [SerializeField] private Vector3 _rotationAxis = Vector3.forward;
-    [SerializeField] private RectTransform _rectTransform;
-
-    private void Update()
+    public class RectTransformRotator : MonoBehaviour
     {
-        _rectTransform.Rotate(_rotationAxis, _rotationSpeed * Time.deltaTime);
+        [SerializeField] private float _rotationSpeed = 90f;
+        [SerializeField] private Vector3 _rotationAxis = Vector3.forward;
+        [SerializeField] private RectTransform _rectTransform;
+
+        private void Update()
+        {
+            _rectTransform.Rotate(_rotationAxis, _rotationSpeed * Time.deltaTime);
+        }
     }
 }
